@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Free Mobile: authentification classique
-// @version        0.0.36
+// @version        0.0.37
 // @namespace      https://github.com/g2p
 // @author         Gabriel <g2p.code@gmail.com> https://github.com/g2p
 // @description    Authentification Free Mobile sans clavier visuel
@@ -177,7 +177,7 @@ function fixForm() {
     let form = $('#ident_div_ident form')[0];
     $('p:first', form).hide();
     $('#ident_txt_identifiant', form).hide();
-    $('#ident_chiffre', form).hide();
+    $('#ident_chiffre2', form).hide();
     $('<input type="text">')
         .attr({id: 'ident_login'}).insertAfter('#ident_pos');
     $(form).submit(function() {
