@@ -175,9 +175,7 @@ if (false) {
 
 function fixForm() {
     let form = $('#ident_div_ident form');
-    $('p:first', form).hide();
-    $('#ident_txt_identifiant', form).hide();
-    $('.ident_chiffre2', form).hide();
+    $('p:first, #ident_txt_identifiant, .ident_chiffre2', form).hide();
     $('<input type="text">')
         .attr({id: 'ident_login'}).insertAfter('#ident_pos');
     $(form).submit(function() {
