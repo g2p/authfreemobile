@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Free Mobile: authentification classique
-// @version        0.0.39
+// @version        0.0.40
 // @namespace      https://github.com/g2p
 // @author         Gabriel <g2p.code@gmail.com> https://github.com/g2p
 // @description    Authentification Free Mobile sans clavier visuel
@@ -19,6 +19,8 @@ if ($('#ident_pos').length == 0)
     return; // XXX Not portable?
 
 let log = console.log;
+
+let FORM_DELAY_MILLIS = 4000;
 
 let imgs = $('.pointer');
 let img0 = imgs[0];
@@ -178,15 +180,41 @@ function fixForm() {
     $('p:first, #ident_txt_identifiant, #btAideVocale, .ident_chiffre2', form).hide();
     $('<input type="text">')
         .attr({id: 'ident_login'}).insertAfter('#ident_pos');
-    $(form).submit(function() {
+    $(form).one('submit', function() {
         let rdigits = ocr().rdigits;
         let lgn = $('#ident_login').val();
         let encoded = '';
+        let waiting = lgn.length;
+        let waitingTime = true;
+        let reqImgs = {};
+
+        $('<span class="red">').text(
+            'En attente de soumission…').insertAfter('.ident_chiffre2');
+
+        setTimeout(function () {
+            waitingTime = false;
+            if (! waiting)
+                form.submit();
+        }, FORM_DELAY_MILLIS);
+
         $.each(lgn, function(idx, digit) {
-            encoded += rdigits[digit];
+            edigit = rdigits[digit];
+            encoded += edigit;
+
+            if (reqImgs[edigit]) {
+                waiting--;
+                return;
+            }
+
+            reqImgs[edigit] = true;
+            $.ajax('chiffre.php?pos=' + digit + '&small=1').always(function() {
+                waiting--;
+                if (! waiting && ! waitingTime)
+                    form.submit();
+            });
         });
         $('#ident_pos').val(encoded);
-        return true;
+        return false;
     });
 }
 
